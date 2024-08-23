@@ -1,34 +1,34 @@
 import requests
 
-API_URL = "https://api-inference.huggingface.co/models/openai-community/gpt2-large"
-headers = {"Authorization": "Bearer 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"}
+# Configura tus claves API y URLs
+CHAT_API_URL = 'https://api-inference.huggingface.co/models/openai-community/gpt2-large'
+IMAGE_API_URL = 'https://creator.nightcafe.studio/studio?open=creation&panelContext=%28jobId%3Ap23IlEZ0u8Xz86zjMLyf%29'
+CHAT_API_KEY = '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'
+IMAGE_API_KEY = '3f657d8b-07d4-4d89-9da1-e57c2134c847'
 
-def query(payload):
+def generate_text_response(prompt):
+    headers = {'Authorization': f'Bearer {CHAT_API_KEY}', 'Content-Type': 'application/json'}
+    data = {'inputs': prompt}  # Cambié 'prompt' a 'inputs' según la API de Hugging Face
     try:
-        response = requests.post(API_URL, headers=headers, json=payload)
-        response.raise_for_status()  # Verificar si la solicitud fue exitosa
+        response = requests.post(CHAT_API_URL, headers=headers, json=data)
+        response.raise_for_status()
         response_json = response.json()
-        print("Respuesta completa de la API:", response_json)  # Imprime la respuesta completa
-        return response_json
+        print("Respuesta completa de la API de texto:", response_json)  # Imprime la respuesta completa
+        return response_json[0]['generated_text']  # Asegúrate de que esta es la estructura correcta de la respuesta
     except requests.exceptions.RequestException as e:
         print(f"Error al hacer la solicitud: {e}")
-        return {}
+        return ''
 
-def generar_respuesta(prompt):
+def generate_image(prompt):
+    headers = {'Authorization': f'Bearer {IMAGE_API_KEY}', 'Content-Type': 'application/json'}
+    data = {'prompt': prompt}
     try:
-        data = query({"inputs": prompt})
-        print("Datos procesados:", data)  # Imprime los datos procesados antes de acceder a las claves
-        if isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict) and "generated_text" in data[0]:
-            return data[0]['generated_text']
-        elif isinstance(data, dict) and "generated_text" in data:
-            return data['generated_text']
-        else:
-            return "No se pudo generar una respuesta."
-    except Exception as e:
-        return f"Error al generar la respuesta: {e}"
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    prompt_usuario = input("Describe tu situación emocional o pregunta: ")
-    respuesta = generar_respuesta(prompt_usuario)
-    print("Consejo de amigo:", respuesta)
+        response = requests.post(IMAGE_API_URL, headers=headers, json=data)
+        response.raise_for_status()
+        response_json = response.json()
+        print("Respuesta completa de la API de imagen:", response_json)  # Imprime la respuesta completa
+        image_url = response_json.get('image_url', '')
+        return image_url
+    except requests.exceptions.RequestException as e:
+        print(f"Error al hacer la solicitud: {e}")
+        return ''

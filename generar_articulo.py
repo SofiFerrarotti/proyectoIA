@@ -1,28 +1,16 @@
-import requests
+from api_chat import generate_text_response, generate_image
 
-API_URL = "https://api-inference.huggingface.co/models/openai-community/gpt2-large"
-headers = {"Authorization": "Bearer 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"}
-
-def generar_articulo(prompt):
-    try:
-        # Enviar solicitud a la API
-        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
-        response.raise_for_status()  # Verificar si la solicitud fue exitosa
-        response_json = response.json()
-        print("Respuesta completa de la API:", response_json)  # Imprime la respuesta completa
-        
-        # Verificar y extraer el texto generado
-        if isinstance(response_json, dict) and "generated_text" in response_json:
-            return response_json['generated_text']
-        elif isinstance(response_json, list) and len(response_json) > 0 and "generated_text" in response_json[0]:
-            return response_json[0]['generated_text']
-        else:
-            return "No se pudo generar el artículo."
-    except requests.exceptions.RequestException as e:
-        return f"Error al generar el artículo: {e}"
+def create_article_with_image(text_prompt, image_prompt):
+    text_response = generate_text_response(text_prompt)
+    image_url = generate_image(image_prompt)
+    
+    article = f"Artículo generado:\n{text_response}\n\nImagen asociada:\n{image_url}"
+    
+    return article
 
 # Ejemplo de uso
-if __name__ == "__main__":
-    prompt = "Escribe un artículo de 1000 palabras sobre cómo gestionar la ansiedad, incluyendo técnicas de respiración, ejercicios de relajación y consejos prácticos."
-    articulo = generar_articulo(prompt)
-    print("Artículo generado:", articulo)
+text_prompt = "Escribe un artículo sobre la importancia del apoyo emocional."
+image_prompt = "Imagen conceptual sobre apoyo emocional"
+
+article = create_article_with_image(text_prompt, image_prompt)
+print(article)
