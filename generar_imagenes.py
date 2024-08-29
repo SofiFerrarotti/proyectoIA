@@ -13,9 +13,9 @@ def generate_image(prompt):
     try:
         # Realizar la solicitud POST a la API
         response = requests.post(IMAGE_API_URL, data=data, headers=headers)
-        response.raise_for_status()  # Verificar si la solicitud fue exitosa
+        response.raise_for_status()  
         response_json = response.json()
-        print("Respuesta completa de la API de imagen:", response_json)  # Imprimir la respuesta completa
+        print("Respuesta completa de la API de imagen:", response_json)
         image_url = response_json.get('output_url', '')
         return image_url
     except requests.exceptions.RequestException as e:
